@@ -140,6 +140,24 @@ class Main(QWidget):
         self.timer_wifi.setInterval(5000)
         self.timer_wifi.timeout.connect(self.checkWifiConnected)
         self.timer_wifi.start()
+        
+        #[250909_SeokJu.Yang_add alive check timer
+        self.aliveCheckTimer = QTimer(self)
+        self.aliveCheckTimer.setInterval(3000)
+        self.aliveCheckTimer.timeout.connect(self.AliveCheck)
+        self.aliveCheckTimer.start()
+        #]250909_SeokJu.Yang_add alive check timer
+        
+    #[250909_SeokJu.Yang_add alive check timer
+    def AliveCheck(self):
+        try:
+            if not self.timer_wifi.isActive():
+                logger.debug("self.timer_wifi restart")
+                self.timer_wifi.start()
+        except Exception as e:
+            logger.debug(f"[{self.__class__.__name__}][{sys._getframe().f_code.co_name}][Exception] : {e}")
+    #[250909_SeokJu.Yang_add alive check timer
+    
     
     # def onChange(self, i):  # change tab restart timer
     #     if i == 2:
@@ -225,7 +243,7 @@ class Main(QWidget):
         try:
             # self.config = Config('config_th.ini', debug=False)
             # self.version = self.config.getValue("Setting","version")
-            self.setWindowTitle(f'Monitoring System_ATK_250728')
+            self.setWindowTitle(f'Monitoring System_ATK_250909')
             self.setWindowFlags(Qt.Window)
             self.setGeometry(0, 0, 800, 450)
 
@@ -472,14 +490,14 @@ class Main(QWidget):
                 Main.idLabelColor = "white"
                 self.id_label.setStyleSheet(f"font : 8pt bold; color : white; background-color: #325d79; border : none;")
             #]240620_SeokJu.Yang_Add idLabelBackColor(if (QA_Alarm == 1) color changed red) 
-            self.config = Config('config_th.ini', debug=False)
-            self.update_ver = self.config.getValue("Setting", "update_ver")
-            if self.update_ver == 1:
-                self.update_timer = QTimer(self)
-                self.update_timer.setInterval(60000)
-                self.update_timer.timeout.connect(self.reboot_raspberrypi)
-                self.update_timer.start()
-                QMessageBox.information(self,"UPDATE","             Updated Version exists\nProgram will be reboot after 1 minute")
+            # self.config = Config('config_th.ini', debug=False)
+            # self.update_ver = self.config.getValue("Setting", "update_ver")
+            # if self.update_ver == 1:
+            #     self.update_timer = QTimer(self)
+            #     self.update_timer.setInterval(60000)
+            #     self.update_timer.timeout.connect(self.reboot_raspberrypi)
+            #     self.update_timer.start()
+            #     QMessageBox.information(self,"UPDATE","             Updated Version exists\nProgram will be reboot after 1 minute")
         except Exception as e:
             logger.debug(f"[{self.__class__.__name__}][{sys._getframe().f_code.co_name}][Exception] : {e}")
     
@@ -1105,8 +1123,30 @@ class Monitor(QWidget):
                 self.timer_write.setInterval(60000 * self.write_interval)  # milsec -> min
                 self.timer_write.timeout.connect(self.timeOutWrite)
                 self.timer_write.start()
+                
+                #[250909_SeokJu.Yang_add alive check timer
+                self.aliveCheckTimer = QTimer(self)
+                self.aliveCheckTimer.setInterval(3000)
+                self.aliveCheckTimer.timeout.connect(self.AliveCheck)
+                self.aliveCheckTimer.start()
+                #]250909_SeokJu.Yang_add alive check timer
         except Exception as e:
             logger.debug(f"[{self.__class__.__name__}][{sys._getframe().f_code.co_name}][Exception] : {e}")
+    
+            
+    #[250909_SeokJu.Yang_add alive check timer
+    def AliveCheck(self):
+        try:
+            if not self.timer_read.isActive():
+                logger.debug("self.timer_read restart")
+                self.timer_read.start()
+            if not self.timer_write.isActive():
+                logger.debug("self.timer_write restart")
+                self.timer_write.start()
+        except Exception as e:
+            logger.debug(f"[{self.__class__.__name__}][{sys._getframe().f_code.co_name}][Exception] : {e}")
+    #]250909_SeokJu.Yang_add alive check timer
+            
             
     def setConfig_save(self):
         try:
@@ -1447,6 +1487,13 @@ class PopMonitor(Monitor):
         self.timer_curTime.timeout.connect(self.curTimeDisplay)
         self.timer_curTime.start()
         
+        #[250909_SeokJu.Yang_add alive check timer
+        self.aliveCheckTimer = QTimer(self)
+        self.aliveCheckTimer.setInterval(3000)
+        self.aliveCheckTimer.timeout.connect(self.AliveCheck)
+        self.aliveCheckTimer.start()
+        #]250909_SeokJu.Yang_add alive check timer
+        
         self.showFullScreen()
         self.setAutoFillBackground(True)
         p = self.palette()
@@ -1455,6 +1502,19 @@ class PopMonitor(Monitor):
         self.showFullScreen()
         self.config = Config('config_th.ini', debug=False)
         self.delaytime_mode = self.config.getValue("Setting", "delaytime_mode")
+       
+    #[250909_SeokJu.Yang_add alive check timer
+    def AliveCheck(self):
+        try:
+            if not self.timer_read2.isActive():
+                logger.debug("self.timer_read2 restart")
+                self.timer_read2.start()
+            if not self.timer_curTime.isActive():
+                logger.debug("self.timer_curTime restart")
+                self.timer_curTime.start()
+        except Exception as e:
+            logger.debug(f"[{self.__class__.__name__}][{sys._getframe().f_code.co_name}][Exception] : {e}")
+    #]250909_SeokJu.Yang_add alive check timer
         
     def closeEvent(self, event):
         try:
